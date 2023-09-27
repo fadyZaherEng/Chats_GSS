@@ -82,6 +82,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void getMassage({
     required String receiverId,
   }) {
+    print(receiverId);
+    print(userProfile!.uid);
     emit(HomeLoadingState());
     FirebaseFirestore.instance
         .collection('users')
@@ -95,7 +97,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       massages = [];
       for (var element in event.docs) {
         massages.add(MassageModel.fromJson(element.data()));
-        emit(HomeLoadingState());
       }
       emit(HomeGetMassageSuccessState(massages));
     }).onError((error) {

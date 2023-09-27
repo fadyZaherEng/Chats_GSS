@@ -18,7 +18,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController textController = TextEditingController();
-
+  ScrollController scrollController=ScrollController();
   HomeBloc get _bloc => BlocProvider.of<HomeBloc>(context);
   List<MassageModel> massages = [];
 
@@ -54,6 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     state: state,
                     receiverId: widget.receiverProfile!.uid,
                     textController: textController,
+                    scrollController: scrollController,
                   ),
                 ],
               ),

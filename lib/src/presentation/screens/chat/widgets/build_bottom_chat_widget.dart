@@ -10,12 +10,14 @@ class BuildBottomChatWidget extends StatefulWidget {
   dynamic context, state;
   TextEditingController textController;
   String receiverId;
+  ScrollController scrollController;
 
   BuildBottomChatWidget({
     required this.context,
     required this.state,
     required this.textController,
     required this.receiverId,
+    required this.scrollController
   });
 
   @override
@@ -77,7 +79,7 @@ class _BuildBottomChatWidgetState extends State<BuildBottomChatWidget> {
                     );
                     widget.textController.text = '';
                   }
-                  //  scrollController.jumpTo(scrollController.position.maxScrollExtent);
+                    widget.scrollController.jumpTo(widget.scrollController.position.maxScrollExtent);
                 },
                 child: const Icon(
                   Icons.send,

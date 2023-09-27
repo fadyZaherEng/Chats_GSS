@@ -18,6 +18,8 @@ class ChatListViewWidget extends StatefulWidget {
 }
 
 class _ChatListViewWidgetState extends State<ChatListViewWidget> {
+  var scrollController=ScrollController();
+
   HomeBloc get _bloc => BlocProvider.of<HomeBloc>(context);
 
   @override
@@ -28,7 +30,7 @@ class _ChatListViewWidgetState extends State<ChatListViewWidget> {
         child: ListView.separated(
             physics: const BouncingScrollPhysics(),
             reverse: true,
-            //  controller: scrollController,
+            controller: scrollController,
             itemBuilder: (context, index) {
               var massage = widget.massages[index];
               if (_bloc.userProfile!.uid == massage.senderId) {

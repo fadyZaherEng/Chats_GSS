@@ -1,7 +1,10 @@
 import 'package:chats/src/config/router/navigate_with_return.dart';
 import 'package:chats/src/domain/entities/sign_in_models/user_profile.dart';
+import 'package:chats/src/presentation/blocs/home/home_bloc.dart';
+import 'package:chats/src/presentation/blocs/home/home_event.dart';
 import 'package:chats/src/presentation/screens/chat/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UserListItemWidget extends StatefulWidget {
   BuildContext context;
@@ -14,6 +17,8 @@ class UserListItemWidget extends StatefulWidget {
 }
 
 class _UserListItemWidgetState extends State<UserListItemWidget> {
+  HomeBloc get _bloc => BlocProvider.of<HomeBloc>(context);
+
   @override
   Widget build(BuildContext context) {
     return  InkWell(
@@ -77,6 +82,7 @@ class _UserListItemWidgetState extends State<UserListItemWidget> {
         ),
       ),
       onTap: () {
+        _bloc.add(HomeGetMassagesEvent(receiverId: widget.userProfile!.uid));
         navigateToWithReturn(context: context, screen: ChatScreen(widget.userProfile));
       },
     );
