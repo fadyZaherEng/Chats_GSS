@@ -59,11 +59,9 @@ class MyApp extends StatelessWidget {
 
   Widget startScreen() {
     String? signIn = SharedHelper.get(key: 'uid');
-
     if (signIn != null) {
       return SplashScreen('home');
     }
     return SplashScreen('logIn');
   }
 }
-
