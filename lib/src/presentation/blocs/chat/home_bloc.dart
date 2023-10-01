@@ -1,23 +1,28 @@
 // ignore_for_file: avoid_print, invalid_use_of_visible_for_testing_member
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chats/src/core/utils/constants/nums.dart';
 import 'package:chats/src/core/utils/show_toast.dart';
 import 'package:chats/src/data/sources/local/cashe_helper.dart';
 import 'package:chats/src/domain/entities/home_models/massage_model.dart';
 import 'package:chats/src/domain/entities/sign_in_models/user_profile.dart';
-import 'package:chats/src/presentation/blocs/home/home_event.dart';
-import 'package:chats/src/presentation/blocs/home/home_state.dart';
+import 'package:chats/src/presentation/blocs/chat/home_event.dart';
+import 'package:chats/src/presentation/blocs/chat/home_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitialState()) {
     on<HomeGetAllUsersEvent>(_onHomeGetAllUsersEvent);
+    on<HomeGetCurrentUserEvent>(_onHomeGetCurrentUserEvent);
     on<HomeGetMassagesEvent>(_onHomeGetMassagesEvent);
     on<HomeAddMassagesEvent>(_onHomeAddMassagesEvent);
+    on<HomeUploadImageMassagesEvent>(_onHomeUploadImageMassagesEvent);
     on<HomeSignOutEvent>(_onHomeSignOutEvent);
   }
 
@@ -43,12 +48,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required String? text,
     required String dateTime,
     required String createdAt,
+    required String? chatImage,
   }) {
     emit(HomeLoadingState());
     MassageModel model = MassageModel(
       senderId: userProfile!.uid,
       receiverId: receiverId,
       text: text,
+      image: chatImage,
       dateTime: dateTime,
       createdAt: createdAt,
     );
@@ -77,12 +84,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(HomeAddMassageErrorState());
     });
   }
+
   List<MassageModel> massages = [];
+
   //get massages
   void getMassage({
     required String receiverId,
   }) {
     emit(HomeLoadingState());
+    print("${userProfile!.uid}ggggggggggggggg");
+    print("${receiverId}hhhhhhhhhhhhhhhhhhhh");
     FirebaseFirestore.instance
         .collection('users')
         .doc(userProfile!.uid)
@@ -125,36 +136,101 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }); //uid
   }
 
-  FutureOr<void> _onHomeGetAllUsersEvent(HomeGetAllUsersEvent event,
-      Emitter<HomeState> emit) {
+  FutureOr<void> _onHomeGetAllUsersEvent(
+      HomeGetAllUsersEvent event, Emitter<HomeState> emit) {
     getAllUsers();
   }
 
-  FutureOr<void> _onHomeGetMassagesEvent(HomeGetMassagesEvent event,
-      Emitter<HomeState> emit) {
+  FutureOr<void> _onHomeGetMassagesEvent(
+      HomeGetMassagesEvent event, Emitter<HomeState> emit) {
     getMassage(receiverId: event.receiverId);
   }
 
-  FutureOr<void> _onHomeAddMassagesEvent(HomeAddMassagesEvent event,
-      Emitter<HomeState> emit) {
+  FutureOr<void> _onHomeAddMassagesEvent(
+      HomeAddMassagesEvent event, Emitter<HomeState> emit) {
     addMassage(
       receiverId: event.receiverId,
       text: event.text,
+      chatImage: event.image,
       dateTime: event.dateTime,
       createdAt: event.createdAt,
     );
   }
 
-  FutureOr<void> _onHomeSignOutEvent(HomeSignOutEvent event,
-      Emitter<HomeState> emit)async {
-   emit(HomeLoadingState());
-   await FirebaseAuth.instance
-        .signOut()
-        .then((value) {
-          emit(HomeSignOutState());
-    }).catchError((onError){
+  FutureOr<void> _onHomeSignOutEvent(
+      HomeSignOutEvent event, Emitter<HomeState> emit) async {
+    emit(HomeLoadingState());
+    await FirebaseAuth.instance.signOut().then((value) {
+      emit(HomeSignOutState());
+    }).catchError((onError) {
       showToast(message: onError.toString(), state: ToastState.ERROR);
       emit(HomeGetUserErrorState());
     });
+  }
+
+  //image
+  void getChatImage({
+    required String receiverId,
+    required String? text,
+    required String dateTime,
+    required String createdAt,
+  }) async {
+    emit(HomeUploadImageMassageLoadingState());
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      uploadChatImage(
+        chatImage: File(pickedFile.path),
+        text: text,
+        dateTime: dateTime,
+        createdAt: createdAt,
+        receiverId: receiverId,
+      );
+    } else {
+      showToast(message: 'No Chat Image Selected', state: ToastState.WARNING);
+      emit(HomeUploadImageMassageErrorState());
+    }
+  }
+
+  void uploadChatImage({
+    required File chatImage,
+    required String receiverId,
+    required String? text,
+    required String dateTime,
+    required String createdAt,
+  }) {
+    FirebaseStorage.instance
+        .ref()
+        .child(
+            'chats/${Uri.file(chatImage.path).pathSegments.length / DateTime.now().millisecondsSinceEpoch}')
+        .putFile(chatImage)
+        .then((val) {
+      val.ref.getDownloadURL().then((value) {
+        addMassage(
+            receiverId: receiverId,
+            text: text,
+            dateTime: dateTime,
+            createdAt: createdAt,
+            chatImage: value.toString());
+      }).catchError((onError) {
+        emit(HomeUploadImageMassageSuccessState());
+      });
+    }).catchError((onError) {
+      emit(HomeUploadImageMassageErrorState());
+    });
+  }
+
+  FutureOr<void> _onHomeUploadImageMassagesEvent(
+      HomeUploadImageMassagesEvent event, Emitter<HomeState> emit) {
+    getChatImage(
+        receiverId: event.receiverId,
+        text: event.text,
+        dateTime: event.dateTime,
+        createdAt: event.createdAt);
+  }
+
+  FutureOr<void> _onHomeGetCurrentUserEvent(
+      HomeGetCurrentUserEvent event, Emitter<HomeState> emit) {
+    getUserProfile();
   }
 }

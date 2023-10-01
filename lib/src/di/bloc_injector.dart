@@ -1,8 +1,7 @@
-
 import 'package:chats/src/core/utils/constants/nums.dart';
 import 'package:chats/src/data/sources/local/cashe_helper.dart';
 import 'package:chats/src/di/injector.dart';
-import 'package:chats/src/presentation/blocs/home/home_bloc.dart';
+import 'package:chats/src/presentation/blocs/chat/home_bloc.dart';
 import 'package:chats/src/presentation/blocs/internet/internet_bloc.dart';
 import 'package:chats/src/presentation/blocs/sign_in/sign_in_bloc.dart';
 import 'package:chats/src/presentation/blocs/sign_up/sign_up_bloc.dart';
@@ -11,7 +10,7 @@ import 'package:chats/src/presentation/blocs/theme/theme_event.dart';
 
 Future<void> blocInjection() async {
   instance.registerLazySingleton<HomeBloc>(
-    () => HomeBloc()..getUserProfile(),
+    () => HomeBloc(),
   );
   instance.registerLazySingleton<SignInBloc>(
     () => SignInBloc(),

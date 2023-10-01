@@ -2,23 +2,24 @@ import 'package:chats/src/core/utils/get_time.dart';
 import 'package:chats/src/domain/entities/home_models/massage_model.dart';
 import 'package:flutter/material.dart';
 
-class BuildMassageReceiverWidget extends StatefulWidget {
+class BuildTextMassageReceiverWidget extends StatefulWidget {
   MassageModel massageModel;
   int index;
   BuildContext context;
 
-  BuildMassageReceiverWidget({
+  BuildTextMassageReceiverWidget({
     required this.massageModel,
     required this.index,
     required this.context,
   });
 
   @override
-  State<BuildMassageReceiverWidget> createState() =>
-      _BuildMassageReceiverWidgetState();
+  State<BuildTextMassageReceiverWidget> createState() =>
+      _BuildTextMassageReceiverWidgetState();
 }
 
-class _BuildMassageReceiverWidgetState extends State<BuildMassageReceiverWidget> {
+class _BuildTextMassageReceiverWidgetState
+    extends State<BuildTextMassageReceiverWidget> {
   @override
   Widget build(BuildContext context) {
     return Align(
