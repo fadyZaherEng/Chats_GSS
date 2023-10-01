@@ -54,7 +54,7 @@ dependencies:
   connectivity:
   intl:
   image_picker:
-
+  transparent_image:
 dev_dependencies:
   flutter_test:
     sdk: flutter

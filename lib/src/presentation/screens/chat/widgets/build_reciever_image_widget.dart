@@ -1,5 +1,6 @@
 import 'package:chats/src/domain/entities/home_models/massage_model.dart';
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class BuildImageMassageReceiverWidget extends StatefulWidget {
   MassageModel massageModel;
@@ -24,11 +25,21 @@ class _BuildImageMassageReceiverWidgetState
     return InkWell(
       child: Align(
         alignment: AlignmentDirectional.centerStart,
-        child: Image(
-          image: NetworkImage(widget.massageModel.image),
-          width: 150,
+        child: SizedBox(
           height: 150,
-          fit: BoxFit.cover,
+          width: 150,
+          child: Stack(
+            children: [
+              const Center(child: CircularProgressIndicator()),
+              FadeInImage.memoryNetwork(
+                placeholder: kTransparentImage,
+                image: widget.massageModel.image,
+                width: 150,
+                height: 150,
+                fit: BoxFit.cover,
+              ),
+            ],
+          ),
         ),
       ),
       onTap: () {},
