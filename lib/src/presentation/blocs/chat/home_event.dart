@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 abstract class HomeEvent {}
 
 class HomeGetAllUsersEvent extends HomeEvent {}
@@ -8,6 +10,7 @@ class HomeSignOutEvent extends HomeEvent {}
 
 class HomeGetMassagesEvent extends HomeEvent {
   String receiverId;
+
   HomeGetMassagesEvent({required this.receiverId});
 }
 
@@ -20,7 +23,12 @@ class HomeAddMassagesEvent extends HomeEvent {
 
 class HomeUploadImageMassagesEvent extends HomeEvent {
   String receiverId, text, dateTime, createdAt;
-
+  BuildContext context;
   HomeUploadImageMassagesEvent(
-      this.receiverId, this.text, this.dateTime, this.createdAt);
+    this.receiverId,
+    this.text,
+    this.dateTime,
+    this.createdAt,
+    this.context,
+  );
 }

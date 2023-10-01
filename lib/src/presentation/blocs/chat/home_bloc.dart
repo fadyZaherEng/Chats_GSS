@@ -13,6 +13,7 @@ import 'package:chats/src/presentation/blocs/chat/home_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -169,11 +170,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   //image
-  void getChatImage({
+  void getChatGalleryImage({
     required String receiverId,
     required String? text,
     required String dateTime,
     required String createdAt,
+    required context,
   }) async {
     emit(HomeUploadImageMassageLoadingState());
     final pickedFile =
@@ -190,6 +192,72 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       showToast(message: 'No Chat Image Selected', state: ToastState.WARNING);
       emit(HomeUploadImageMassageErrorState());
     }
+  }
+
+  //image
+  void getChatCameraImage({
+    required String receiverId,
+    required String? text,
+    required String dateTime,
+    required String createdAt,
+    required context,
+  }) async {
+    emit(HomeUploadImageMassageLoadingState());
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      uploadChatImage(
+        chatImage: File(pickedFile.path),
+        text: text,
+        dateTime: dateTime,
+        createdAt: createdAt,
+        receiverId: receiverId,
+      );
+    } else {
+      showToast(message: 'No Chat Image Selected', state: ToastState.WARNING);
+      emit(HomeUploadImageMassageErrorState());
+    }
+  }
+
+  //image
+  void getChatImage({
+    required String receiverId,
+    required String? text,
+    required String dateTime,
+    required String createdAt,
+    required context,
+  }) async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Choose"),
+            content: Column(mainAxisSize: MainAxisSize.min, children: [
+              IconButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    getChatGalleryImage(
+                        receiverId: receiverId,
+                        text: text,
+                        dateTime: dateTime,
+                        createdAt: createdAt,
+                        context: context);
+                  },
+                  icon: const Icon(Icons.browse_gallery)),
+              IconButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    getChatCameraImage(
+                        receiverId: receiverId,
+                        text: text,
+                        dateTime: dateTime,
+                        createdAt: createdAt,
+                        context: context);
+                  },
+                  icon: const Icon(Icons.camera)),
+            ]),
+          );
+        });
   }
 
   void uploadChatImage({
@@ -223,6 +291,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   FutureOr<void> _onHomeUploadImageMassagesEvent(
       HomeUploadImageMassagesEvent event, Emitter<HomeState> emit) {
     getChatImage(
+        context: event.context,
         receiverId: event.receiverId,
         text: event.text,
         dateTime: event.dateTime,
