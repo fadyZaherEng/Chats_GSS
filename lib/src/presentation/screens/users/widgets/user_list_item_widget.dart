@@ -7,7 +7,7 @@ class UserListItemWidget extends StatefulWidget {
   BuildContext context;
   UserProfile userProfile;
 
-  UserListItemWidget(this.context, this.userProfile);
+  UserListItemWidget(this.context, this.userProfile, {super.key});
 
   @override
   State<UserListItemWidget> createState() => _UserListItemWidgetState();
@@ -16,68 +16,64 @@ class UserListItemWidget extends StatefulWidget {
 class _UserListItemWidgetState extends State<UserListItemWidget> {
   @override
   Widget build(BuildContext context) {
-    return  InkWell(
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        widget.userProfile.name,
-                        style:const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize:22,
-                        ),
-                      ),
+    return InkWell(
+      child: SizedBox(
+        width: double.infinity,
+        child: Card(
+          margin: const EdgeInsetsDirectional.symmetric(horizontal: 10),
+          color: Colors.black12,
+          elevation: 0,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Center(
+                  child: Text(
+                    widget.userProfile.name,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
                     ),
                   ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Column(
-                    mainAxisAlignment:MainAxisAlignment.start ,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                    [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          widget.userProfile.email,
-                          style:const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                            fontSize:17,
-                          ),
-                        ),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.userProfile.email,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal,
+                        fontSize: 17,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          widget.userProfile.phone,
-                          style:const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                            fontSize:17,
-                          ),
-                        ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      widget.userProfile.phone,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal,
+                        fontSize: 17,
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
       onTap: () {
-        navigateToWithReturn(context: context, screen: ChatScreen(widget.userProfile));
+        navigateToWithReturn(
+            context: context, screen: ChatScreen(widget.userProfile));
       },
     );
   }

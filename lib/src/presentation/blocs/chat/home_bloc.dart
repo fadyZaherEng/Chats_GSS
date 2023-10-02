@@ -277,11 +277,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required context,
   }) async {
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Choose"),
-            content: Column(mainAxisSize: MainAxisSize.min, children: [
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Choose"),
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
               IconButton(
                   onPressed: () async {
                     Navigator.pop(context);
@@ -292,7 +296,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                         createdAt: createdAt,
                         context: context);
                   },
-                  icon: const Icon(Icons.browse_gallery)),
+                  icon: const Icon(Icons.photo)),
+              const SizedBox(
+                height: 10,
+              ),
               IconButton(
                   onPressed: () async {
                     Navigator.pop(context);
@@ -303,10 +310,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                         createdAt: createdAt,
                         context: context);
                   },
-                  icon: const Icon(Icons.camera)),
-            ]),
-          );
-        });
+                  icon: const Icon(Icons.camera_alt)),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void uploadChatImage({
