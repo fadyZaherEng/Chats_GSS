@@ -8,6 +8,7 @@ class BuildTextMassageSenderWidget extends StatefulWidget {
   BuildContext context;
 
   BuildTextMassageSenderWidget({
+    super.key,
     required this.massageModel,
     required this.index,
     required this.context,

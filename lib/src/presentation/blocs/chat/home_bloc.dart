@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, invalid_use_of_visible_for_testing_member
+// ignore_for_file: avoid_print, invalid_use_of_visible_for_testing_member, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:io';
@@ -16,6 +16,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitialState()) {
@@ -93,8 +94,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required String receiverId,
   }) {
     emit(HomeLoadingState());
-    print("${userProfile!.uid}ggggggggggggggg");
-    print("${receiverId}hhhhhhhhhhhhhhhhhhhh");
+    // print("${userProfile!.uid}ggggggggggggggg");
+    // print("${receiverId}hhhhhhhhhhhhhhhhhhhh");
     FirebaseFirestore.instance
         .collection('users')
         .doc(userProfile!.uid)
@@ -219,6 +220,54 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
+  checkPermissions({
+    required String receiverId,
+    required String? text,
+    required String dateTime,
+    required String createdAt,
+    required context,
+  }) async {
+    if (await Permission.storage.request().isDenied) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                content: const Text(
+                  "requires permissions to Gallery and camera so that you can post images",
+                  style: TextStyle(height: 1.3),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      if (await Permission.storage.request().isGranted) {
+                        Navigator.pop(context);
+                      } else {
+                        Permission.storage.request();
+                        Permission.camera.request();
+                        Permission.photos.request();
+                      }
+                    },
+                    child: const Text("Grant Now"),
+                  )
+                ],
+              ));
+    } else if (await Permission.storage.request().isGranted) {
+      getChatImage(
+          receiverId: receiverId,
+          text: text,
+          dateTime: dateTime,
+          createdAt: createdAt,
+          context: context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Not Allow Please allow from settings"),
+        ),
+      );
+    }
+  }
+
   //image
   void getChatImage({
     required String receiverId,
@@ -290,7 +339,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   FutureOr<void> _onHomeUploadImageMassagesEvent(
       HomeUploadImageMassagesEvent event, Emitter<HomeState> emit) {
-    getChatImage(
+    checkPermissions(
         context: event.context,
         receiverId: event.receiverId,
         text: event.text,
